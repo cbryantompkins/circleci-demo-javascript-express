@@ -5,6 +5,7 @@ workflows:
   build:
     jobs:
       - build
+      - print
 
 jobs:
   build:
@@ -40,3 +41,15 @@ jobs:
           prefix: coverage
       - store_test_results:
           path: test-results.xml
+  print:
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/node:10.16.3
+      - image: mongo:4.2.0
+    steps:
+      - run:
+          name: hello
+          command: 'echo "hello world" >> output.txt'
+      - run:
+          name: cat
+          command: 'cat output.txt'
