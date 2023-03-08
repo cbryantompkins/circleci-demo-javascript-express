@@ -5,7 +5,8 @@ workflows:
   build:
     jobs:
       - build
-      - print
+      - save_hello_world_output
+      - print_output_file
 
 jobs:
   build:
@@ -41,15 +42,29 @@ jobs:
           prefix: coverage
       - store_test_results:
           path: test-results.xml
-  print:
+          
+  save_hello_world_output:
     working_directory: ~/mern-starter
     docker:
       - image: circleci/node:10.16.3
-      - image: mongo:4.2.0
+      - image: mongo:4.2.0    
     steps:
       - run:
-          name: hello
-          command: 'echo "hello world" >> output.txt'
+          name: make output.txt
+          command: 'echo "hello world" > output.txt'
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - .
+  print_output_file:
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/node:10.16.3
+      - image: mongo:4.2.0    
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - run:
-          name: cat
+          name: cat output.txt
           command: 'cat output.txt'
+
