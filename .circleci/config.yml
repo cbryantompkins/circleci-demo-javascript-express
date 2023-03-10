@@ -1,70 +1,31 @@
 version: 2.1
 
 workflows:
-  version: 2
-  build:
+  my_workflow:
     jobs:
-      - build
       - save_hello_world_output
-      - print_output_file
+      - print_output_file :
+          requires:
+            - save_hello_world_output
 
 jobs:
-  build:
-    working_directory: ~/mern-starter
-    docker:
-      - image: circleci/node:10.16.3
-      - image: mongo:4.2.0
-    steps:
-      - checkout
-      - run:
-          name: update-npm
-          command: 'sudo npm install -g npm@5'
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-      - run:
-          name: install-npm-wee
-          command: npm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
-          paths:
-            - ./node_modules
-      - run:
-          name: test
-          command: npm test
-      - run:
-          name: code-coverage
-          command: './node_modules/.bin/nyc report --reporter=text-lcov'
-      - store_artifacts:
-          path: test-results.xml
-          prefix: tests
-      - store_artifacts:
-          path: coverage
-          prefix: coverage
-      - store_test_results:
-          path: test-results.xml
-          
   save_hello_world_output:
-    working_directory: ~/mern-starter
     docker:
-      - image: circleci/node:10.16.3
-      - image: mongo:4.2.0    
+      - image: circleci/node:13.8.0
     steps:
-      - run:
-          name: make output.txt
-          command: 'echo "hello world" >> /tmp/workspace/output.txt'
+      - run: 'echo "hello world" > ~/output.txt'
       - persist_to_workspace:
-          root: /tmp/workspace
+          root: ~/
           paths:
-            - .
+            - output.txt
+
   print_output_file:
-    working_directory: ~/mern-starter
     docker:
-      - image: circleci/node:10.16.3
-      - image: mongo:4.2.0    
+      - image: circleci/node:13.8.0
     steps:
       - attach_workspace:
-          at: /tmp/workspace
+          at: ~/
       - run:
           name: cat output.txt
-          command: 'cat /tmp/workspace/output.txt'
+          command: 'cat ~/output.txt'
 
