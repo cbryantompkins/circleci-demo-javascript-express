@@ -17,7 +17,7 @@ workflows:
       - print_output_file :
           requires:
             - save_hello_world_output
-      - pipelineid
+      - print_workflow_id
 
 jobs:
   save_hello_world_output:
@@ -45,5 +45,5 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - pipelineid:
-          to: << parameters.to >>
+          to: &defualt
 
