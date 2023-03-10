@@ -1,5 +1,15 @@
 version: 2.1
 
+commands:
+  pipelineid:
+    description: prints the pipeline id
+    parameters:
+      to:
+        type: string
+        default: $CIRCLE_WORKFLOW_ID
+    steps:
+      - run: echo << parameters.to >>
+
 workflows:
   my_workflow:
     jobs:
@@ -7,6 +17,7 @@ workflows:
       - print_output_file :
           requires:
             - save_hello_world_output
+      - pipelineid
 
 jobs:
   save_hello_world_output:
@@ -28,4 +39,11 @@ jobs:
       - run:
           name: cat output.txt
           command: 'cat ~/output.txt'
+
+  print_workflow_id:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - pipelineid:
+          to: << parameters.to >>
 
