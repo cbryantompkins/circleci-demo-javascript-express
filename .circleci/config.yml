@@ -18,6 +18,7 @@ workflows:
           requires:
             - save_hello_world_output
       - print_workflow_id
+      - fail
 
 jobs:
   save_hello_world_output:
@@ -46,4 +47,14 @@ jobs:
     steps:
       - pipelineid:
           to: &defualt
+  
+  fail:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - run:
+          command: return 1
+      - run:
+          command: echo Test Failed
+          when: on_fail 
 
